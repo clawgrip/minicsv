@@ -33,9 +33,23 @@ public final class SimplePdfCsvStamer {
 	private static final String CFG_KEY_KEYSTORE_ENTRYPASSWORD = "keystore.entrypassword"; //$NON-NLS-1$
 	private static final String CFG_KEY_KEYSTORE_ENTRYALIAS = "keystore.entryalias"; //$NON-NLS-1$
 
+	/** N&uacute;mero de p&aacute;gina del PDF donde insertar la imagen
+	 * (la numeraci&oacute;n comienza en 1). */
+	private static final String CFG_KEY_CSV_PAGE = "csv.page"; //$NON-NLS-1$
+
+	/** Distancia de la imagen al borde izquiero de la p&aacute;gina del PDF. */
+	private static final String CFG_KEY_CSV_LEFT = "csv.left"; //$NON-NLS-1$
+
+	/** Distancia de la imagen al borde inferior de la p&aacute;gina del PDF. */
+	private static final String CFG_KEY_CSV_BOTTOM = "csv.bottom"; //$NON-NLS-1$
+
 	private static final String DEFAULT_SIGN_ALGO = "SHA512withRSA"; //$NON-NLS-1$
 	private static final PrivateKey DEFAULT_SIGN_KEY;
 	private static final Certificate[] DEAULT_SIGN_CHAIN;
+
+	private static final int CSV_PAGE;
+	private static final int CSV_LEFT;
+	private static final int CSV_BOTTOM;
 
 	private static final Properties CFG = new Properties();
 	static {
@@ -91,6 +105,27 @@ public final class SimplePdfCsvStamer {
 		catch (final KeyStoreException e) {
 			throw new IllegalStateException(
 				"Error cargando la cadena de certificados para el alias '" + CFG.getProperty(CFG_KEY_KEYSTORE_ENTRYALIAS) + "': " + e, e //$NON-NLS-1$ //$NON-NLS-2$
+			);
+		}
+		try {
+			CSV_PAGE = Integer.parseInt(
+				CFG.getProperty(CFG_KEY_CSV_PAGE)
+			);
+			if (CSV_PAGE < 0) {
+				throw new UnsupportedOperationException(
+					"El valor del numero de pagina de estampacion del CSV es invalido: " + CFG.getProperty(CFG_KEY_CSV_PAGE) //$NON-NLS-1$
+				);
+			}
+			CSV_BOTTOM = Integer.parseInt(
+				CFG.getProperty(CFG_KEY_CSV_BOTTOM)
+			);
+			CSV_LEFT = Integer.parseInt(
+				CFG.getProperty(CFG_KEY_CSV_LEFT)
+			);
+		}
+		catch (final Exception e) {
+			throw new IllegalStateException(
+				"No se han configurado adecuadamente los valores de estampacion del CSV: " + e //$NON-NLS-1$
 			);
 		}
 	}
@@ -152,9 +187,9 @@ public final class SimplePdfCsvStamer {
 		final byte[] pdfOut = PdfExtraUtil.addImageToPdf(
 			flatPdf,
 			csv,
-			5,
-			5,
-			1,
+			CSV_LEFT,
+			CSV_BOTTOM,
+			CSV_PAGE,
 			PdfExtraUtil.getLink(pdfId, null)
 		);
 

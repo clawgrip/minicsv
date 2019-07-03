@@ -206,16 +206,33 @@ public final class PdfExtraUtil {
 		final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 		try {
 			final PdfStamper stamper = new PdfStamper(reader, baos);
-			PdfPreProcessor.addImage(
-				inJpg,
-				imgWidth,
-				imgheight,
-				left,
-				bottom,
-				pageNum,
-				url,
-				stamper
-			);
+			// Si se indica 0 se estampa en todas las paginas
+			if (pageNum == 0) {
+				for (int i=1;i<=reader.getNumberOfPages();i++) {
+					PdfPreProcessor.addImage(
+						inJpg,
+						imgWidth,
+						imgheight,
+						left,
+						bottom,
+						i,
+						url,
+						stamper
+					);
+				}
+			}
+			else {
+				PdfPreProcessor.addImage(
+					inJpg,
+					imgWidth,
+					imgheight,
+					left,
+					bottom,
+					pageNum,
+					url,
+					stamper
+				);
+			}
 			stamper.close();
 		}
 		catch (final DocumentException e) {
