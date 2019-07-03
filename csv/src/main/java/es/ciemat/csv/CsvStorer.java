@@ -13,4 +13,10 @@ public interface CsvStorer {
 	void storePdfWithCsv(final PdfId pdfWithCsv,
 			             final byte[] pdfWithSignatures) throws CsvStorerException;
 
+	/** Obtiene un PDF con CSV a partir de su identificador o del PDF original.
+	 * @param pdfId Identificador del PDF y/o PDF original.
+	 * @return PDF con el CSV.
+	 * @throws CsvStorerException Si hay errores durante el proceso. */
+	byte[] retrievePdfWithCsv(final PdfId pdfId) throws CsvStorerException;
+
 }

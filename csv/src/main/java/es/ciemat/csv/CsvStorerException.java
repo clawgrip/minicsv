@@ -19,4 +19,10 @@ public final class CsvStorerException extends Exception {
 		super(cause);
 	}
 
+	/** Crea una excepci&oacute;n relativa al almacenamiento de PDF con CSV.
+	 * @param d Descripci&oacute;n. */
+	public CsvStorerException(final String d) {
+		super(d);
+	}
+
 }

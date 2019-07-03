@@ -1,7 +1,10 @@
 package es.ciemat.csv.cms;
 
+import java.io.IOException;
+
 import es.ciemat.csv.CsvStorer;
 import es.ciemat.csv.CsvStorerException;
+import es.ciemat.csv.PdfExtraUtil;
 import es.ciemat.csv.PdfExtraUtil.PdfId;
 
 /** Almacenador de CSV en gestor documental.
@@ -37,6 +40,28 @@ public final class CmisCsvStorer implements CsvStorer {
 			throw new CsvStorerException(
 				"Error almacenando el documento con CSV", //$NON-NLS-1$
 				e
+			);
+		}
+	}
+
+	@Override
+	public byte[] retrievePdfWithCsv(final PdfId pdfId) throws CsvStorerException {
+		final String id;
+		try {
+			id = pdfId.getId() != null ? pdfId.getId() : PdfExtraUtil.getPdfId(pdfId.getPdf());
+		}
+		catch (final IOException e) {
+			throw new CsvStorerException(
+				"No se ha indicado el CSV del documento: " + e, e //$NON-NLS-1$
+			);
+		}
+
+		try {
+			return CmsDocumentManager.loadDocument(id + SUFFIX_CSV + SUFFIX_PDF);
+		}
+		catch (CmsFolderNotFoundException | FileNoExistsOnCmsException | IOException e) {
+			throw new CsvStorerException(
+				"No se ha podido leer el documento con identificador '" + id + "' del repositorio: " + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
 	}

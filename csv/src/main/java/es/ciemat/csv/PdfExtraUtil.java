@@ -242,7 +242,11 @@ public final class PdfExtraUtil {
 		return baos.toByteArray();
 	}
 
-	static String getPdfId(final byte[] inPdf) throws IOException {
+	/** Obtiene el identificador de un PDF.
+	 * @param inPdf PDF de entrada.
+	 * @return Identificador del PDF de entrada.
+	 * @throws IOException Si hay errores en la obtenci&oacute;n. */
+	public static String getPdfId(final byte[] inPdf) throws IOException {
 		if (inPdf == null) {
 			throw new IllegalArgumentException(
 				"El PDF no puede ser nulo" //$NON-NLS-1$
