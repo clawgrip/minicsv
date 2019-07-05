@@ -39,7 +39,7 @@ public final class CsvService extends HttpServlet {
 		try (
 			final PrintWriter pw = resp.getWriter();
 		) {
-			pw.write("Servicio de genracion de CSV, admite solo llamadas POST de tipo REST"); //$NON-NLS-1$
+			pw.write("Servicio de generacion de CSV, admite solo llamadas POST de tipo REST"); //$NON-NLS-1$
 		}
 	}
 
@@ -77,7 +77,7 @@ public final class CsvService extends HttpServlet {
 
 	    final PdfId pdfId;
 	    try {
-	    	pdfId = SimplePdfCsvStamer.stampCsv(fileData);
+	    	pdfId = SimplePdfCsvStamper.stampCsv(fileData);
 		}
 	    catch (final AOFormatFileException e) {
 	    	LOGGER.severe("La entrada no es un documento PDF: " + e); //$NON-NLS-1$

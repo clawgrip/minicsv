@@ -27,19 +27,24 @@ public final class FileSystemCsvStorer implements CsvStorer {
 	}
 
 	@Override
-	public byte[] retrievePdfWithCsv(final PdfId pdfId) throws CsvStorerException {
+	public byte[] retrievePdfWithCsv(final PdfId pdfId) throws CsvStorerException, CsvFileNotFoundException {
 		final String id;
 		try {
 			id = pdfId.getId() != null ? pdfId.getId() : PdfExtraUtil.getPdfId(pdfId.getPdf());
 		}
 		catch (final IOException e) {
+			Logger.getLogger(FileSystemCsvStorer.class.getName()).severe(
+				pdfId.getId() == null ?
+					"No se ha indicado el CSV del documento: " + e : //$NON-NLS-1$
+						"Id de documento invalido (" + pdfId.getId() + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
 			throw new CsvStorerException(
 				"No se ha indicado el CSV del documento: " + e, e //$NON-NLS-1$
 			);
 		}
 		final File f = new File(TMP_DIR, id + SUFFIX_CSV + SUFFIX_PDF);
 		if (!f.isFile()) {
-			throw new CsvStorerException(
+			throw new CsvFileNotFoundException(
 				"No existe el documento con CSV con identificador '" + id + "'" //$NON-NLS-1$ //$NON-NLS-2$
 			);
 		}
@@ -64,12 +69,13 @@ public final class FileSystemCsvStorer implements CsvStorer {
 			);
 		}
 
+		final File fCsv = new File(
+			TMP_DIR,
+			pdfWithCsv.getId() + SUFFIX_CSV + SUFFIX_PDF
+		);
 		try (
 			final OutputStream fos = new FileOutputStream(
-				new File(
-					TMP_DIR,
-					pdfWithCsv.getId() + SUFFIX_CSV + SUFFIX_PDF
-				)
+				fCsv
 			)
 		) {
 			fos.write(pdfWithCsv.getPdf());
@@ -80,6 +86,10 @@ public final class FileSystemCsvStorer implements CsvStorer {
 				"Error guardando el PDF con CSV: " + e, e //$NON-NLS-1$
 			);
 		}
+		Logger.getLogger(FileSystemCsvStorer.class.getName()).info(
+			"PDF con CSV '" + pdfWithCsv.getId() + "' guardado en: " + fCsv.getAbsolutePath() //$NON-NLS-1$ //$NON-NLS-2$
+		);
+
 		if (pdfWithSignatures != null && pdfWithSignatures.length > 0) {
 			try (
 				final OutputStream fos = new FileOutputStream(

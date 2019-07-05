@@ -23,9 +23,9 @@ import es.gob.afirma.signers.pades.AOPDFSigner;
 
 /** Estampador de CSV en PDF.
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
-public final class SimplePdfCsvStamer {
+public final class SimplePdfCsvStamper {
 
-	private static final Logger LOGGER = Logger.getLogger(SimplePdfCsvStamer.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(SimplePdfCsvStamper.class.getName());
 
 	private static final String CFG_KEY_KEYSTORE_TYPE = "keystore.type"; //$NON-NLS-1$
 	private static final String CFG_KEY_KEYSTORE_FILE = "keystore.file"; //$NON-NLS-1$
@@ -54,7 +54,7 @@ public final class SimplePdfCsvStamer {
 	private static final Properties CFG = new Properties();
 	static {
 		try {
-			CFG.load(SimplePdfCsvStamer.class.getResourceAsStream("/csvconfig.properties")); //$NON-NLS-1$
+			CFG.load(SimplePdfCsvStamper.class.getResourceAsStream("/csvconfig.properties")); //$NON-NLS-1$
 		}
 		catch (final IOException | NullPointerException e) {
 			throw new IllegalStateException(
@@ -130,7 +130,7 @@ public final class SimplePdfCsvStamer {
 		}
 	}
 
-	private SimplePdfCsvStamer() {
+	private SimplePdfCsvStamper() {
 		// No instanciable
 	}
 

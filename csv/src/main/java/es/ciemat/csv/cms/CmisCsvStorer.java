@@ -2,6 +2,7 @@ package es.ciemat.csv.cms;
 
 import java.io.IOException;
 
+import es.ciemat.csv.CsvFileNotFoundException;
 import es.ciemat.csv.CsvStorer;
 import es.ciemat.csv.CsvStorerException;
 import es.ciemat.csv.PdfExtraUtil;
@@ -45,7 +46,7 @@ public final class CmisCsvStorer implements CsvStorer {
 	}
 
 	@Override
-	public byte[] retrievePdfWithCsv(final PdfId pdfId) throws CsvStorerException {
+	public byte[] retrievePdfWithCsv(final PdfId pdfId) throws CsvStorerException, CsvFileNotFoundException {
 		final String id;
 		try {
 			id = pdfId.getId() != null ? pdfId.getId() : PdfExtraUtil.getPdfId(pdfId.getPdf());
@@ -59,10 +60,13 @@ public final class CmisCsvStorer implements CsvStorer {
 		try {
 			return CmsDocumentManager.loadDocument(id + SUFFIX_CSV + SUFFIX_PDF);
 		}
-		catch (CmsFolderNotFoundException | FileNoExistsOnCmsException | IOException e) {
+		catch (CmsFolderNotFoundException | IOException e) {
 			throw new CsvStorerException(
 				"No se ha podido leer el documento con identificador '" + id + "' del repositorio: " + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);
+		}
+		catch (final FileNoExistsOnCmsException e) {
+			throw new CsvFileNotFoundException(id);
 		}
 	}
 

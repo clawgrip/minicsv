@@ -269,18 +269,16 @@ public final class PdfExtraUtil {
 		private final String id;
 
 		PdfId(final byte[] pdfBytes, final String strId) {
-			if (pdfBytes == null) {
-				throw new IllegalArgumentException(
-					"El PDF no puede ser nulo" //$NON-NLS-1$
-				);
-			}
-			if (strId == null || strId.isEmpty()) {
-				throw new IllegalArgumentException(
-					"El identificador no puede ser nulo ni vacio" //$NON-NLS-1$
-				);
-			}
-			this.pdf = pdfBytes.clone();
+			this.pdf = pdfBytes != null ? pdfBytes.clone() : null;
 			this.id = strId;
+		}
+
+		PdfId(final byte[] pdfBytes) {
+			this(pdfBytes, null);
+		}
+
+		PdfId(final String strId) {
+			this(null, strId);
 		}
 
 		/** Obtiene el identificador del PDF.
@@ -292,7 +290,7 @@ public final class PdfExtraUtil {
 		/** Obtiene el contenido del PDF.
 		 * @return Contenido del PDF. */
 		public byte[] getPdf() {
-			return this.pdf.clone();
+			return this.pdf != null ? this.pdf.clone() : null;
 		}
 
 	}
