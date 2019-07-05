@@ -23,7 +23,6 @@
 	<script type="text/javascript" src="js/miniapplet.js"></script>
 	<script type="text/javascript" src="js/constantes.js"></script>
 	<script type="text/javascript" defer="defer">
-	<!--
 		/* Indica si debe firmarse un fichero (true) o el formulario de la pagina (false) */ 
 		var firmarFichero;
 		var firmarDatosGenerados;
@@ -92,7 +91,7 @@
 			// **************************************************************
 			// **************** NUEVO PARA CSV ******************************
 			var httpRequest = MiniApplet.getHttpRequest();
-			httpRequest.open("POST", "http://demo.tgm:8080/csv/CsvService", true);
+			httpRequest.open("POST", "http://raq.uel:8080/csv/CsvService", true);
 			httpRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 			httpRequest.onreadystatechange = function() {
 				alert(httpRequest.status);
@@ -204,7 +203,7 @@
 		function ocultarDialogoEspera() {
 			document.getElementById("dialogoEspera").style.display = "none";
 		}
-	-->
+
 		//MiniApplet.cargarMiniApplet(Constants.URL_BASE_APPLET);
 		MiniApplet.setServlets(Constants.URL_BASE_SERVICES + "/afirma-signature-storage/StorageService", Constants.URL_BASE_SERVICES + "/afirma-signature-retriever/RetrieveService");
 		MiniApplet.setForceWSMode(true);
