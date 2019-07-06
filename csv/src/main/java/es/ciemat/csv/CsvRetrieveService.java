@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URLDecoder;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
@@ -16,8 +15,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
 import es.ciemat.csv.PdfExtraUtil.PdfId;
-import es.gob.afirma.core.AOException;
-import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
@@ -52,13 +49,13 @@ public final class CsvRetrieveService extends HttpServlet {
 			catch (final CsvStorerException e) {
 				response.sendError(
 					HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-					"Error obteniendo el PDF con CSV" //$NON-NLS-1$
+					"Error obteniendo el PDF con CSV '" + URLDecoder.decode(csv, "UTF-8") + "': " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				);
 			}
 			catch (final CsvFileNotFoundException e) {
 				response.sendError(
 					HttpServletResponse.SC_BAD_REQUEST,
-					"No hay un PDF con CSV " + URLDecoder.decode(csv, "UTF-8") //$NON-NLS-1$ //$NON-NLS-2$
+					"No hay un PDF con CSV '" + URLDecoder.decode(csv, "UTF-8") + "': " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 				);
 			}
 
@@ -96,7 +93,7 @@ public final class CsvRetrieveService extends HttpServlet {
 			try {
 				filePart = request.getPart("file"); // Recupera <input type="file" name="file"> //$NON-NLS-1$
 			}
-			catch(final ServletException e) {
+			catch(final ServletException | IllegalStateException e) {
 				// No es multiparte
 				LOGGER.info(
 					"La entrada no es multiparte, se intentara recuperar el PDF del cuerpo del POST: " + e //$NON-NLS-1$
@@ -113,76 +110,15 @@ public final class CsvRetrieveService extends HttpServlet {
 		    }
 		}
 
-	    final PdfId pdfId;
-	    try {
-	    	pdfId = SimplePdfCsvStamper.stampCsv(fileData);
-		}
-	    catch (final AOFormatFileException e) {
-	    	LOGGER.severe("La entrada no es un documento PDF: " + e); //$NON-NLS-1$
-	    	response.sendError(
-    			HttpURLConnection.HTTP_BAD_REQUEST,
-    			"La entrada no es un documento PDF" //$NON-NLS-1$
-			);
-			return;
-		}
-	    catch (final PdfLacksSignaturesException e) {
-	    	LOGGER.severe("El PDF de entrada no tiene firmas electronicas: " + e); //$NON-NLS-1$
-	    	response.sendError(
-    			HttpURLConnection.HTTP_BAD_REQUEST,
-    			"El PDF de entrada no tiene firmas electronicas" //$NON-NLS-1$
-			);
-			return;
-		}
-	    catch (final IOException e) {
-	    	LOGGER.log(
-    			Level.SEVERE,
-    			"Error estampando el CSV en el PDF: " + e, //$NON-NLS-1$
-    			e
-			);
-	    	response.sendError(
-    			HttpURLConnection.HTTP_INTERNAL_ERROR,
-    			"Error estampando el CSV en el PDF" //$NON-NLS-1$
-			);
-			return;
-	    }
-	    catch (final AOException e) {
-	    	LOGGER.log(
-    			Level.SEVERE,
-    			"Error sellando electronicamente el PDF: " + e, //$NON-NLS-1$
-    			e
-			);
-	    	response.sendError(
-    			HttpURLConnection.HTTP_INTERNAL_ERROR,
-    			"Error sellando electronicamente el PDF" //$NON-NLS-1$
-			);
-			return;
-		}
-	    catch (final PdfLacksIdException e) {
-	    	LOGGER.severe("El PDF de entrada no tiene idnetificador: " + e); //$NON-NLS-1$
-	    	response.sendError(
-    			HttpURLConnection.HTTP_BAD_REQUEST,
-    			"El PDF de entrada no tiene firmas indetificador" //$NON-NLS-1$
-			);
-			return;
-		}
+		// En este punto, fileData contiene el PDF de entrada, calculamos
+		// su ID
+		final String id = PdfExtraUtil.getPdfId(fileData);
 
-	    // Enviamos el PDF
-	    final CsvStorer storer = ServiceConfig.getCsvStorer();
-	    try {
-			storer.storePdfWithCsv(pdfId, fileData);
-		}
-	    catch (final CsvStorerException e) {
-	    	LOGGER.log(
-    			Level.SEVERE,
-    			"Error guardando el CSV: " + e, //$NON-NLS-1$
-    			e
-			);
-	    	response.sendError(
-    			HttpURLConnection.HTTP_INTERNAL_ERROR,
-    			"Guardando el CSV" //$NON-NLS-1$
-			);
-		}
+		// Con el ID, obtenemos el PDF
 
+		// TODO: HACERLO
+
+		// QUITAR ESTO CUANDO SE DEVUELVA EL PDF
 	    response.sendError(HttpURLConnection.HTTP_OK);
 
 	}
