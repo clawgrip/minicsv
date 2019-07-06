@@ -17,6 +17,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.security.MessageDigest;
 import java.util.UUID;
 
 import javax.imageio.ImageIO;
@@ -29,6 +30,7 @@ import com.aowagie.text.pdf.Barcode128;
 import com.aowagie.text.pdf.PdfReader;
 import com.aowagie.text.pdf.PdfStamper;
 
+import es.gob.afirma.core.misc.Base64;
 import es.gob.afirma.core.signers.AOSimpleSignInfo;
 import es.gob.afirma.core.util.tree.AOTreeModel;
 import es.gob.afirma.core.util.tree.AOTreeNode;
@@ -355,7 +357,7 @@ public final class TestPdfUtils {
 			)
 		);
 
-		final byte[] outPdf = SimplePdfCsvStamer.stampCsv(inPdf).getPdf();
+		final byte[] outPdf = SimplePdfCsvStamper.stampCsv(inPdf).getPdf();
 
 		try (
 			final OutputStream fos = new FileOutputStream(
@@ -366,6 +368,23 @@ public final class TestPdfUtils {
 			fos.flush();
 		}
 
+	}
+	/** Prueba de la obtenci&oacute;n del identificador de un documento. */
+	@SuppressWarnings("static-method")
+	@Test
+	//@Ignore
+	public void testIdPdf() throws Exception {
+		final byte[] inPdf = Files.readAllBytes(
+			Paths.get(
+				"C:/Users/rcuevas/AppData/Local/Temp/4Vo9P7Oh5fmspCbp9Fzc9x5ZAOw=_ORI.pdf" //$NON-NLS-1$
+			)
+		);
+
+		//System.out.println(Base64.encode(inPdf));
+		final String id = PdfExtraUtil.getPdfId(inPdf);
+		final MessageDigest md = MessageDigest.getInstance("SHA-1");
+		final String hash = Base64.encode(md.digest(inPdf));
+		System.out.println(id);
 	}
 
 }
