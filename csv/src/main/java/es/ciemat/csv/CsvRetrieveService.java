@@ -3,11 +3,11 @@ package es.ciemat.csv;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.URLDecoder;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
+import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -20,6 +20,7 @@ import es.gob.afirma.core.misc.Base64;
 
 /** Servicio de recuperaci&oacute;n de documentos con CSV. */
 @WebServlet(description = "Servicio de recuperacion de documentos con CSV", urlPatterns = { "/CsvRetrieveService" })
+@MultipartConfig
 public final class CsvRetrieveService extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
@@ -115,11 +116,38 @@ public final class CsvRetrieveService extends HttpServlet {
 		final String id = PdfExtraUtil.getPdfId(fileData);
 
 		// Con el ID, obtenemos el PDF
+		final CsvStorer storer = ServiceConfig.getCsvStorer();
 
-		// TODO: HACERLO
+		byte[] pdf = null;
+		try {
+			pdf = storer.retrievePdfWithCsv(
+				new PdfId(
+					URLDecoder.decode(id, "UTF-8") //$NON-NLS-1$
+				)
+			);
+		}
+		catch (final CsvStorerException e) {
+			response.sendError(
+				HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+				"Error obteniendo el PDF con CSV '" + URLDecoder.decode(id, "UTF-8") + "': " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			);
+		}
+		catch (final CsvFileNotFoundException e) {
+			response.sendError(
+				HttpServletResponse.SC_BAD_REQUEST,
+				"No hay un PDF con CSV '" + URLDecoder.decode(id, "UTF-8") + "': " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			);
+		}
 
-		// QUITAR ESTO CUANDO SE DEVUELVA EL PDF
-	    response.sendError(HttpURLConnection.HTTP_OK);
+		// Ya tenemos el PDF, lo devolvemos en el response con el MIME-Type apropiado
+		try (
+			final OutputStream os = response.getOutputStream()
+		) {
+			response.setContentType("application/pdf"); //$NON-NLS-1$
+		    os.write(pdf);
+		    os.flush();
+		    os.close();
+		}
 
 	}
 
