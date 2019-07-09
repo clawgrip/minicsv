@@ -2,118 +2,38 @@
 <html>
 <head>
 <meta charset="ISO-8859-1">
-<title>VALIDe</title>
-	<link rel="stylesheet" type="text/css" href="css/estilos.css" media="screen">
-	<meta http-equiv="Expires" content="0">
-	<meta http-equiv="Last-Modified" content="0">
-	<meta http-equiv="content-type" content="text/html; charset=ISO-8859-1">
-	<meta http-equiv="content-script-type" content="text/javascript"> 
-	<meta http-equiv="Pragma" content="no-cache">
-	<meta http-equiv="Expires" content="0">
-	<meta http-equiv="Cache-Control" content="no-cache,no-store">
-	<meta name="lang" content="es">
-	<meta name="author" content="Dirección General para el impulso de la Administración Electrónica">
-	<meta name="organization" content="Ministerio de Hacienda y Administraciones Públicas">
-	<meta name="locality" content="Madrid, España">
-	<meta name="keywords" content="VALIDe, validacion firmas, validacion certificados, realizar firma, demostrador @firma, @firma, cliente firma, firma electrónica, certificado electrónico, CMS, CAdES, XAdES, XMLDSig">
-	<meta name="description" content="Firma móvil. Web de pruebas del Cliente @firma móvil ">
-	<style>
-		OBJECT   { width:1px; height:1px; position:absolute; top:50%; left:50%; }
-		APPLET   { width:1px; height:1px; position:absolute; top:50%; left:50%; }
-	</style>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/core.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/sha1.min.js"></script>
-	<script type="text/javascript">
-
-	function cargarPdf() {
-		var file = document.getElementById("pdf").files;
-		var fileByteArr;
-		var fileResult;
-		var bytes;
-		if (file.length > 0) {
-	        var fileToLoad = file[0];
-			var reader = new FileReader();
-			
-			reader.onload = function (evt) {
-			     fileResult = evt.target.result;
-			     //bytes = new Uint8Array(fileResult); 
-			     fileByteArr = CryptoJS.lib.ByteArray.create(fileResult);
-			}
-		}
-		reader.readAsArrayBuffer(fileToLoad);
-		var hash = CryptoJS.SHA1(fileByteArr);
-	    alert(btoa(hash));
-	}
-	
-// 	var base64;	
-// 	function cargarPdf() {
-// 		var file = document.getElementById("pdf").files;
-// 		var stringBase64;
-// 		if (file.length > 0) {
-//             var fileToLoad = file[0];
-//             var fileReader = new FileReader();
-//             fileReader.onload = function(fileLoadedEvent) {
-// 	            base64 = fileLoadedEvent.target.result;
-// 	         	stringBase64 = base64.toString();
-// 	            alert(base64);
-//          	};
-//             // Convert data to base64
-//             fileReader.readAsDataURL(fileToLoad);
-//             //var subBase64 = base64.substring(28);
-//             var hash = CryptoJS.SHA1("JVBERi0xLjcKJeLjz9MKMSAwIG9iago8PC9UeXBlL1NpZy9GaWx0ZXIvQWRvYmUuUFBLTGl0ZS9TdWJGaWx0ZXIvYWRiZS5wa2NzNy5kZXRhY2hlZC9NKEQ6MjAxNzA1MjEyMTQ0NTkrMDInMDAnKS9OYW1lKEdBUkNJQS1NRVJBUyBDQVBPVEUgVE9NQVMgLSAxMTgzMDk2MEopL0J5dGVSYW5nZSBbMCAyNTcgNTQyNTkgNTc0MzQgXSAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIC9Db250ZW50cyA8MzA4MjE2ZjQwNjA5MmE4NjQ4ODZmNzBkMDEwNzAyYTA4MjE2ZTUzMDgyMTZlMTAyMDEwMTMxMGYzMDBkMDYwOTYwODY0ODAxNjUwMzA0MDIwMzA1MDAzMDBiMDYwOTJhODY0ODg2ZjcwZDAxMDcwMWEwODIxMzE1MzA4MjA1ODQzMDgyMDM2Y2EwMDMwMjAxMDIwMjEwMDA4MWJiZGQ2YjI0MWZkYWI0YmU4ZjFiZGEwODU1YzQzMDBkMDYwOTJhODY0ODg2ZjcwZDAxMDEwNTA1MDAzMDNiMzEwYjMwMDkwNjAzNTUwNDA2MTMwMjQ1NTMzMTExMzAwZjA2MDM1NTA0MGEwYzA4NDY0ZTRkNTQyZDUyNDM0ZDMxMTkzMDE3MDYwMzU1MDQwYjBjMTA0MTQzMjA1MjQxNDk1YTIwNDY0ZTRkNTQyZDUyNDM0ZDMwMWUxNzBkMzAzODMxMzAzMjM5MzEzNTM1MzkzNTM1NWExNzBkMzMzMDMwMzEzMDMxMzAzMDMwMzAzMDMwNWEzMDNiMzEwYjMwMDkwNjAzNTUwNDA2MTMwMjQ1NTMzMTExMzAwZjA2MDM1NTA0MGEwYzA4NDY0ZTRkNTQyZDUyNDM0ZDMxMTkz");
-//     		var result = CryptoJS.enc.Hex.stringify(hash);
-//     		alert(result);
-//         }
-// 	}
-	</script>
+<title>Gestor documental CMIS</title>
 </head>
 <body>
 	
-<div class="cabecera">
-	<a title="Cliente Afirma" class="floatLeft">
-		<img src="img/logo_cliente.png" alt="Cliente @firma" title="Ciente @firma" style="width: 180px; height: 57px; margin-left: 26px; margin-top: 10px;">
-	</a>
-	<a href="http://www.lamoncloa.gob.es/home.htm" title="Gobierno de España">
-		<img src="img/logoGobEsp.PNG" alt="www.lamoncloa.gob.es" title="Gobierno de España" class="logoGobEsp">
-	</a>
-</div>
+<header style="height:160px; background-image:url(img/background.jpg)">
+	<img style="margin-left:60px; margin-top:63px;" src="img/logo.jpg">
+</header>
+	<br><br>
+	<div style="font-family:verdana; text-align:center; font-size:25px;">
+		<b>Recuperaci&oacute;n de documentos</b>
+	</div>
 	<!-- FORMULARIO -->
-	Cargue el documento PDF o introduzca el CSV del documento.
-	<form id="retrieverCsvForm" method="get" action="http://localhost:8080/csv/CsvRetrieveService">
-		<br>Introducir CSV:<br>
-		<input id="csv" name="csv"><br>
-		<button id="button" type="submit">Enviar</button>
-	</form>
-	<form id="retrieverPdfForm" method="post" action="http://localhost:8080/csv/CsvRetrieveService">
-		<br>Cargar PDF:<br>
-		<input id="file" name="file" type="file"><br>
-		<button id="button" type="submit">Enviar</button>
-	</form>
+	<div style="margin-left:40px; font-family:verdana;">
+		<br><br>
+		<b>Cargue el documento original con firmas electr&oacute;nicas o introduzca el CSV del documento</b>
+	</div>
+	<div style="margin-left:60px; font-family:verdana;">
+		<form id="retrieverCsvForm" method="get" action="http://localhost:8080/csv/CsvRetrieveService">
+			<br>Introducir CSV:<br>
+			<input id="csv" name="csv"><br><br>
+			<button id="button" type="submit">Visualizar</button>
+		</form>
+	</div>
+	<br>
+	<div style="margin-left:60px; font-family:verdana;">
+		<form id="retrieverPdfForm" method="post" action="http://localhost:8080/csv/CsvRetrieveService" enctype="multipart/form-data">
+			<br>Cargar documento:<br>
+			<input id="file" name="file" type="file"><br><br>
+			<button id="button" type="submit">Visualizar</button>
+		</form>
+	</div>
 	<!-- FORMULARIO -->
-
-<div style="float: left; width: 200px; margin-left: 30px; margin-top: 60px;">
-<a href="https://play.google.com/store/apps/details?id=es.gob.afirma">
-  <img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/generic/es-play-badge-border.png" style="width: 140px;"/>
-</a>
-</div>
-
-<div style="float: left; width: 200px; margin-left: 30px; margin-top: 20px;">
-<a href="https://itunes.apple.com/es/app/cliente-firma-movil/id627410001?mt=8&uo=4" target="itunes_store"style="display:inline-block;overflow:hidden;background:url(https://linkmaker.itunes.apple.com/htmlResources/assets/es_es//images/web/linkmaker/badge_appstore-lrg.png) no-repeat;width:135px;height:40px;@media only screen{background-image:url(https://linkmaker.itunes.apple.com/htmlResources/assets/es_es//images/web/linkmaker/badge_appstore-lrg.svg);}"></a>
-</div>
-				 <div class="clear"></div>
-		<div id="contenidoBottom"></div>
-		<div id="pie">
-			
-<!-- LOGOS PIE ** -->
-<div id="logos">
-	<img src="img/btn_w3c_aa.gif" class="logo_w3c" alt="W3C AA">
-	<img src="img/btn_w3c_css.gif" class="logo_w3c" alt="W3C CSS">
-	<img src="img/btn_w3c_xhtml.gif" class="logo_w3c" alt="W3C HTML">
-</div>
-<!-- FIN DE LOGOS PIE ** -->
-<!-- MENÚ PIE ** -->
-
-		</div>
 	
 </body>
 </html>
