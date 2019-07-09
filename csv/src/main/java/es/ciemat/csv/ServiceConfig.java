@@ -23,12 +23,23 @@ public final class ServiceConfig implements ServletContextListener {
 
 	private static CsvStorer csvStorer = null;
 
+	private static final Logger LOGGER = Logger.getLogger(ServiceConfig.class.getName());
+
     @Override
 	public void contextInitialized(final ServletContextEvent event) {
+    	if (DEBUG) {
+    		LOGGER.info(
+				"Inicializando la lectura de configuracion del servicio de CSV..." //$NON-NLS-1$
+			);
+    	}
         try {
 			CFG.load(ServiceConfig.class.getResourceAsStream("/service.properties")); //$NON-NLS-1$
 		}
         catch (final IOException | NullPointerException e) {
+        	LOGGER.severe(
+				"No se ha podido cargar el fichero de configuracion del servicio '" +  //$NON-NLS-1$
+					ServiceConfig.class.getResource("/service.properties") + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
 			throw new IllegalStateException(
 				"No se ha podido cargar el fichero de configuracion del servicio '" +  //$NON-NLS-1$
 					ServiceConfig.class.getResource("/service.properties") + "': " + e //$NON-NLS-1$ //$NON-NLS-2$
@@ -36,9 +47,8 @@ public final class ServiceConfig implements ServletContextListener {
 		}
         if (DEBUG) {
         	Logger.getLogger(ServiceConfig.class.getName()).warning(
-    			"Modo de depuracion activo" //$NON-NLS-1$
+    			"Modo de depuracion activo para el sistema de CSV" //$NON-NLS-1$
 			);
-
         }
     }
 
@@ -46,6 +56,9 @@ public final class ServiceConfig implements ServletContextListener {
     	if (ServiceConfig.csvStorer == null) {
     		final String storerClassName = CFG.getProperty(KEY_STORER_CLASSNAME);
     		if (storerClassName == null) {
+    			LOGGER.severe(
+					"No se ha definido en la configuracion el valor del parametro '" + KEY_STORER_CLASSNAME + "'" //$NON-NLS-1$ //$NON-NLS-2$
+				);
     			throw new IllegalStateException(
 					"No se ha definido en la configuracion el valor del parametro '" + KEY_STORER_CLASSNAME + "'" //$NON-NLS-1$ //$NON-NLS-2$
 				);
@@ -60,11 +73,17 @@ public final class ServiceConfig implements ServletContextListener {
     			         NoSuchMethodException     |
     			         SecurityException         |
     			         ClassNotFoundException e) {
+    			LOGGER.severe(
+					"No se ha podido instanciar la clase de almacen de CSV ('" + storerClassName + "'): " + e //$NON-NLS-1$ //$NON-NLS-2$
+				);
     			throw new IllegalStateException(
 					"No se ha podido instanciar la clase de almacen de CSV ('" + storerClassName + "'): " + e //$NON-NLS-1$ //$NON-NLS-2$
 				);
 			}
     	}
+    	LOGGER.info(
+			"Se usara el almacenador de documentos: " + csvStorer //$NON-NLS-1$
+		);
     	return ServiceConfig.csvStorer;
     }
 

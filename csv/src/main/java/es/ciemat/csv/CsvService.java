@@ -47,10 +47,11 @@ public final class CsvService extends HttpServlet {
 	protected void doPost(final HttpServletRequest request,
 			              final HttpServletResponse response) throws IOException {
 
+		LOGGER.info("Solicitada estampacion de CSV en documento"); //$NON-NLS-1$
+
 		final String base64Data = request.getParameter(PARAM_DATA);
 		final byte[] fileData;
 		if (base64Data != null && !base64Data.isEmpty()) {
-			System.out.println(base64Data);
 			fileData = Base64.decode(base64Data.replace("-", "+").replace("_", "/"));   //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$
 		}
 		else {
@@ -74,6 +75,19 @@ public final class CsvService extends HttpServlet {
 		    	fileData = AOUtil.getDataFromInputStream(fileContent);
 		    }
 		}
+
+		if (fileData == null) {
+			LOGGER.severe(
+				"No se ha recibido un documento valido" //$NON-NLS-1$
+			);
+			response.sendError(
+				HttpServletResponse.SC_BAD_REQUEST,
+				"No se ha recibido un documento valido" //$NON-NLS-1$
+			);
+			return;
+		}
+
+		LOGGER.info("Obtenido un documento de " + fileData.length +  " octetos"); //$NON-NLS-1$ //$NON-NLS-2$
 
 	    final PdfId pdfId;
 	    try {
@@ -120,13 +134,23 @@ public final class CsvService extends HttpServlet {
 			return;
 		}
 	    catch (final PdfLacksIdException e) {
-	    	LOGGER.severe("El PDF de entrada no tiene idnetificador: " + e); //$NON-NLS-1$
+	    	LOGGER.severe("El PDF de entrada no tiene identificador: " + e); //$NON-NLS-1$
 	    	response.sendError(
     			HttpURLConnection.HTTP_BAD_REQUEST,
-    			"El PDF de entrada no tiene firmas indetificador" //$NON-NLS-1$
+    			"El PDF de entrada no tiene identificador" //$NON-NLS-1$
 			);
 			return;
 		}
+	    catch(final Exception | Error e) {
+	    	LOGGER.log(Level.SEVERE, "Error indefinido durante la estampacion: " + e, e); //$NON-NLS-1$
+	    	response.sendError(
+    			HttpURLConnection.HTTP_BAD_REQUEST,
+    			"Error indefinido durante la estampacion" //$NON-NLS-1$
+			);
+			return;
+	    }
+
+	    LOGGER.info("El ID del documento recibido es: " + pdfId.getId()); //$NON-NLS-1$
 
 	    // Enviamos el PDF
 	    final CsvStorer storer = ServiceConfig.getCsvStorer();
@@ -141,9 +165,12 @@ public final class CsvService extends HttpServlet {
 			);
 	    	response.sendError(
     			HttpURLConnection.HTTP_INTERNAL_ERROR,
-    			"Guardando el CSV" //$NON-NLS-1$
+    			"Error guardando el CSV" //$NON-NLS-1$
 			);
+	    	return;
 		}
+
+	    LOGGER.info("Proceso terminado con exito"); //$NON-NLS-1$
 
 	    response.sendError(HttpURLConnection.HTTP_OK);
 

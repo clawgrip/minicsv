@@ -86,7 +86,6 @@ public final class CsvRetrieveService extends HttpServlet {
 		final String base64Data = request.getParameter(PARAM_DATA);
 		final byte[] fileData;
 		if (base64Data != null && !base64Data.isEmpty()) {
-			System.out.println(base64Data);
 			fileData = Base64.decode(base64Data.replace("-", "+").replace("_", "/"));   //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$
 		}
 		else {
@@ -111,6 +110,19 @@ public final class CsvRetrieveService extends HttpServlet {
 		    }
 		}
 
+		if (fileData == null) {
+			LOGGER.severe(
+				"No se ha recibido un documento valido" //$NON-NLS-1$
+			);
+			response.sendError(
+				HttpServletResponse.SC_BAD_REQUEST,
+				"No se ha recibido un documento valido" //$NON-NLS-1$
+			);
+			return;
+		}
+
+		LOGGER.info("Obtenido un documento de " + fileData.length +  " octetos"); //$NON-NLS-1$ //$NON-NLS-2$
+
 		// En este punto, fileData contiene el PDF de entrada, calculamos
 		// su ID
 		final String id = PdfExtraUtil.getPdfId(fileData);
@@ -127,16 +139,24 @@ public final class CsvRetrieveService extends HttpServlet {
 			);
 		}
 		catch (final CsvStorerException e) {
+			LOGGER.severe(
+				"Error obteniendo el PDF con CSV '" + URLDecoder.decode(id, "UTF-8") + "': " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			);
 			response.sendError(
 				HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
 				"Error obteniendo el PDF con CSV '" + URLDecoder.decode(id, "UTF-8") + "': " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			);
+			return;
 		}
 		catch (final CsvFileNotFoundException e) {
+			LOGGER.severe(
+				"No hay un PDF con CSV '" + URLDecoder.decode(id, "UTF-8") + "': " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			);
 			response.sendError(
 				HttpServletResponse.SC_BAD_REQUEST,
 				"No hay un PDF con CSV '" + URLDecoder.decode(id, "UTF-8") + "': " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
 			);
+			return;
 		}
 
 		// Ya tenemos el PDF, lo devolvemos en el response con el MIME-Type apropiado

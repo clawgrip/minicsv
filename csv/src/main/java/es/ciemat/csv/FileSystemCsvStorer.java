@@ -19,11 +19,25 @@ public final class FileSystemCsvStorer implements CsvStorer {
 	private static final String SUFFIX_CSV = "_CSV"; //$NON-NLS-1$
 	private static final String SUFFIX_PDF = ".pdf"; //$NON-NLS-1$
 
+	private static final Logger LOGGER = Logger.getLogger(FileSystemCsvStorer.class.getName());
+
 	private static final File TMP_DIR = new File(System.getProperty("java.io.tmpdir")); //$NON-NLS-1$
 	static {
 		if (!TMP_DIR.isDirectory() || !TMP_DIR.canWrite() || !TMP_DIR.canRead()) {
 			throw new IllegalStateException("Directorio temporal invalido: " + System.getProperty("java.io.tmpdir")); //$NON-NLS-1$ //$NON-NLS-2$
 		}
+	}
+
+	/** Construye el almacenador. */
+	public FileSystemCsvStorer() {
+		LOGGER.warning(
+			"Se esta usando el almacenador en temporal para pruebas, NO USAR EN PRODUCCION" //$NON-NLS-1$
+		);
+	}
+
+	@Override
+	public String toString() {
+		return "Almacenador de documentos (para pruebas) en sistema de ficheros"; //$NON-NLS-1$
 	}
 
 	@Override
@@ -33,7 +47,7 @@ public final class FileSystemCsvStorer implements CsvStorer {
 			id = pdfId.getId() != null ? pdfId.getId() : PdfExtraUtil.getPdfId(pdfId.getPdf());
 		}
 		catch (final IOException e) {
-			Logger.getLogger(FileSystemCsvStorer.class.getName()).severe(
+			LOGGER.severe(
 				pdfId.getId() == null ?
 					"No se ha indicado el CSV del documento: " + e : //$NON-NLS-1$
 						"Id de documento invalido (" + pdfId.getId() + "): " + e //$NON-NLS-1$ //$NON-NLS-2$
@@ -64,10 +78,15 @@ public final class FileSystemCsvStorer implements CsvStorer {
 	public void storePdfWithCsv(final PdfId pdfWithCsv,
 			                    final byte[] pdfWithSignatures) throws CsvStorerException {
 		if (pdfWithCsv == null) {
+			LOGGER.severe(
+				"El PDF con CSV no puede ser nulo" //$NON-NLS-1$
+			);
 			throw new IllegalArgumentException(
 				"El PDF con CSV no puede ser nulo" //$NON-NLS-1$
 			);
 		}
+
+		LOGGER.info("Solicitado almacen de documento en directorio de temporales"); //$NON-NLS-1$
 
 		final File fCsv = new File(
 			TMP_DIR,
@@ -80,39 +99,51 @@ public final class FileSystemCsvStorer implements CsvStorer {
 		) {
 			fos.write(pdfWithCsv.getPdf());
 			fos.flush();
+			fos.close();
 		}
 		catch (final IOException e) {
+			LOGGER.severe(
+				"Error guardando el PDF con CSV: " + e //$NON-NLS-1$
+			);
 			throw new CsvStorerException(
 				"Error guardando el PDF con CSV: " + e, e //$NON-NLS-1$
 			);
 		}
-		Logger.getLogger(FileSystemCsvStorer.class.getName()).info(
+		LOGGER.info(
 			"PDF con CSV '" + pdfWithCsv.getId() + "' guardado en: " + fCsv.getAbsolutePath() //$NON-NLS-1$ //$NON-NLS-2$
 		);
 
+		final File fSig = new File(
+			TMP_DIR,
+			pdfWithCsv.getId() + SUFFIX_ORI + SUFFIX_PDF
+		);
 		if (pdfWithSignatures != null && pdfWithSignatures.length > 0) {
 			try (
 				final OutputStream fos = new FileOutputStream(
-					new File(
-						TMP_DIR,
-						pdfWithCsv.getId() + SUFFIX_ORI + SUFFIX_PDF
-					)
+					fSig
 				)
 			) {
 				fos.write(pdfWithSignatures);
 				fos.flush();
 			}
 			catch (final IOException e) {
+				LOGGER.severe(
+					"Error guardando el PDF con CSV: " + e //$NON-NLS-1$
+				);
 				throw new CsvStorerException(
 					"Error guardando el PDF con CSV: " + e, e //$NON-NLS-1$
 				);
 			}
 		}
 		else {
-			Logger.getLogger(FileSystemCsvStorer.class.getName()).warning(
+			LOGGER.warning(
 				"No se ha proporcionado el PDF original con las firmas" //$NON-NLS-1$
 			);
 		}
+
+		LOGGER.info(
+			"PDF con firmas guardado en: " + fSig.getAbsolutePath() //$NON-NLS-1$
+		);
 
 	}
 
