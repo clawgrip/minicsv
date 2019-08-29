@@ -52,7 +52,7 @@ public final class CsvService extends HttpServlet {
 		final String base64Data = request.getParameter(PARAM_DATA);
 		final byte[] fileData;
 		if (base64Data != null && !base64Data.isEmpty()) {
-			fileData = Base64.decode(base64Data.replace("-", "+").replace("_", "/"));   //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$
+			fileData = Base64.decode(base64Data.replace("-", "+").replace("_", "/")); //$NON-NLS-1$//$NON-NLS-2$//$NON-NLS-3$ //$NON-NLS-4$
 		}
 		else {
 		    Part filePart;
