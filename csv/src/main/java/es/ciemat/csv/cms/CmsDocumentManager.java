@@ -35,12 +35,15 @@ public final class CmsDocumentManager  {
 	private static final String CMS_PWD;
 	private static final String CMIS_PATH;
 
+	private static final Logger LOGGER = Logger.getLogger(CmsDocumentManager.class.getName());
+
 	static {
 		final Properties cfg = new Properties();
 		try {
 			cfg.load(CmsDocumentManager.class.getResourceAsStream("/csvgestdoc.properties")); //$NON-NLS-1$
 		}
 		catch (final IOException e) {
+			LOGGER.severe("No se ha podido cargar el fichero de configuracion: " + e); //$NON-NLS-1$
 			throw new IllegalStateException(
 				"No se ha podido cargar el fichero de configuracion: " + e //$NON-NLS-1$
 			);
@@ -48,6 +51,7 @@ public final class CmsDocumentManager  {
 
 		final String pwd = cfg.getProperty("cmspassword"); //$NON-NLS-1$
 		if (pwd == null) {
+			LOGGER.severe("No se ha especificado la contrasena del gestor documental en el fichero de configuracion"); //$NON-NLS-1$
 			throw new IllegalStateException(
 				"No se ha especificado la contrasena del gestor documental en el fichero de configuracion" //$NON-NLS-1$
 			);
@@ -56,6 +60,7 @@ public final class CmsDocumentManager  {
 
 		final String usr = cfg.getProperty("cmsuser"); //$NON-NLS-1$
 		if (usr == null) {
+			LOGGER.severe("No se ha especificado el usuario del gestor documental en el fichero de configuracion"); //$NON-NLS-1$
 			throw new IllegalStateException(
 				"No se ha especificado el usuario del gestor documental en el fichero de configuracion" //$NON-NLS-1$
 			);
@@ -64,6 +69,7 @@ public final class CmsDocumentManager  {
 
 		final String folder = cfg.getProperty("cmsfolder"); //$NON-NLS-1$
 		if (folder == null) {
+			LOGGER.severe("No se ha especificado la carpeta del gestor documental en el fichero de configuracion"); //$NON-NLS-1$
 			throw new IllegalStateException(
 				"No se ha especificado la carpeta del gestor documental en el fichero de configuracion" //$NON-NLS-1$
 			);
@@ -72,6 +78,7 @@ public final class CmsDocumentManager  {
 
 		final String cmisPath = cfg.getProperty("cmispath"); //$NON-NLS-1$
 		if (cmisPath == null) {
+			LOGGER.severe("No se ha especificado la URL del servicio del gestor documental en el fichero de configuracion"); //$NON-NLS-1$
 			throw new IllegalStateException(
 				"No se ha especificado la URL del servicio del gestor documental en el fichero de configuracion" //$NON-NLS-1$
 			);
@@ -128,10 +135,24 @@ public final class CmsDocumentManager  {
 			                            final String pathAlfresco,
 			                            final Session session) throws FileNoExistsOnCmsException,
 	                                                                  IOException {
-		   final CmisObject object = session.getObjectByPath(
-			   pathAlfresco + (pathAlfresco.endsWith("/") ? "" : "/") + nombre //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-		   );
+		   final CmisObject object;
+		   try {
+			   object = session.getObjectByPath(
+				   pathAlfresco + (pathAlfresco.endsWith("/") ? "" : "/") + nombre //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			   );
+		   }
+		   catch (final CmisObjectNotFoundException e) {
+			   LOGGER.severe(
+				   "No existe el documento con nombre '" +nombre+ "' en la ruta '" +pathAlfresco+ "'" //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+			   );
+			   throw new FileNoExistsOnCmsException(e);
+		   }
 		   if (!(object instanceof Document)) {
+			   LOGGER.severe(
+				   "El objeto recuperado por CMIS " + (object == null ? //$NON-NLS-1$
+					   "es nulo" : //$NON-NLS-1$
+						   "no es un documento, sino un tipo " + object.getClass().getName()) //$NON-NLS-1$
+			   );
 			   throw new FileNoExistsOnCmsException();
 		   }
 		   final Document doc = (Document) object;
@@ -195,7 +216,7 @@ public final class CmsDocumentManager  {
 					mimeType = new MimeHelper(fileBytes).getMimeType();
 				}
 				catch (final IOException e) {
-					Logger.getLogger(CmsDocumentManager.class.getName()).warning(
+					LOGGER.warning(
 						"No se ha podido determinar el tipo del contenido: " + e //$NON-NLS-1$
 					);
 					mimeType = "application/pdf"; //$NON-NLS-1$
@@ -211,10 +232,14 @@ public final class CmsDocumentManager  {
 				newDoc.setContentStream(contentStream2,true,true);
 			}
 			else {
+				LOGGER.warning(
+					"El documento con nombre '" + nombre + "' ya existe en el gestor documental" //$NON-NLS-1$ //$NON-NLS-2$
+				);
 				throw new DocumentAlreadyExistsOnCmsException();
 			}
 		}
 		else {
+			LOGGER.severe("No se ha encontrado la carpeta en el gestor documental"); //$NON-NLS-1$
 			throw new CmsFolderNotFoundException();
 		}
 	}
