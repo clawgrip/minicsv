@@ -47,7 +47,7 @@ public final class PdfExtraUtil {
 
 	private static final int CSV_SPACING = 2;
 
-	private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd 'de' MMMM 'de' yyyy 'a las' hh:mm:ss", new Locale("es_ES")); //$NON-NLS-1$ //$NON-NLS-2$
+	private static final SimpleDateFormat DATE_FORMATTER = new SimpleDateFormat("dd 'de' MMMM 'de' yyyy 'a las' hh:mm:ss", Locale.forLanguageTag("es-ES")); //$NON-NLS-1$ //$NON-NLS-2$
 
 	private static final JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
 	static {
