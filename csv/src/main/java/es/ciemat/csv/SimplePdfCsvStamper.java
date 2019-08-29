@@ -57,7 +57,7 @@ public final class SimplePdfCsvStamper {
 			CFG.load(SimplePdfCsvStamper.class.getResourceAsStream("/csvconfig.properties")); //$NON-NLS-1$
 		}
 		catch (final IOException | NullPointerException e) {
-			LOGGER.info("Error cargando la configuracion del estampador CSV: " + e); //$NON-NLS-1$
+			LOGGER.severe("Error cargando la configuracion del estampador CSV: " + e); //$NON-NLS-1$
 			throw new IllegalStateException(
 				"Error cargando la configuracion del estampador CSV: " + e, e //$NON-NLS-1$
 			);
@@ -67,7 +67,7 @@ public final class SimplePdfCsvStamper {
 			ks = KeyStore.getInstance(CFG.getProperty(CFG_KEY_KEYSTORE_TYPE, KeyStore.getDefaultType()));
 		}
 		catch (final KeyStoreException e) {
-			LOGGER.info("Error instanciando un KeyStore del tipo '" + CFG.getProperty(CFG_KEY_KEYSTORE_TYPE, KeyStore.getDefaultType()) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.severe("Error instanciando un KeyStore del tipo '" + CFG.getProperty(CFG_KEY_KEYSTORE_TYPE, KeyStore.getDefaultType()) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			throw new IllegalStateException(
 				"Error instanciando un KeyStore del tipo '" + CFG.getProperty(CFG_KEY_KEYSTORE_TYPE, KeyStore.getDefaultType()) + "': " + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);
@@ -81,7 +81,7 @@ public final class SimplePdfCsvStamper {
 			);
 		}
 		catch (NoSuchAlgorithmException | CertificateException | IOException | NullPointerException e) {
-			LOGGER.info("Error cargando el KeyStore desde '" + CFG.getProperty(CFG_KEY_KEYSTORE_FILE) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.severe("Error cargando el KeyStore desde '" + CFG.getProperty(CFG_KEY_KEYSTORE_FILE) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			throw new IllegalStateException(
 				"Error cargando el KeyStore desde '" + CFG.getProperty(CFG_KEY_KEYSTORE_FILE) + "': " + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);
@@ -96,7 +96,7 @@ public final class SimplePdfCsvStamper {
 			);
 		}
 		catch (UnrecoverableKeyException | KeyStoreException | NoSuchAlgorithmException e) {
-			LOGGER.info("Error cargando la clave privada con el alias '" + CFG.getProperty(CFG_KEY_KEYSTORE_ENTRYALIAS) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.severe("Error cargando la clave privada con el alias '" + CFG.getProperty(CFG_KEY_KEYSTORE_ENTRYALIAS) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			throw new IllegalStateException(
 				"Error cargando la clave privada con el alias '" + CFG.getProperty(CFG_KEY_KEYSTORE_ENTRYALIAS) + "': " + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);
@@ -107,7 +107,7 @@ public final class SimplePdfCsvStamper {
 			);
 		}
 		catch (final KeyStoreException e) {
-			LOGGER.info("Error cargando la cadena de certificados para el alias '" + CFG.getProperty(CFG_KEY_KEYSTORE_ENTRYALIAS) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
+			LOGGER.severe("Error cargando la cadena de certificados para el alias '" + CFG.getProperty(CFG_KEY_KEYSTORE_ENTRYALIAS) + "': " + e); //$NON-NLS-1$ //$NON-NLS-2$
 			throw new IllegalStateException(
 				"Error cargando la cadena de certificados para el alias '" + CFG.getProperty(CFG_KEY_KEYSTORE_ENTRYALIAS) + "': " + e, e //$NON-NLS-1$ //$NON-NLS-2$
 			);
@@ -117,7 +117,7 @@ public final class SimplePdfCsvStamper {
 				CFG.getProperty(CFG_KEY_CSV_PAGE)
 			);
 			if (CSV_PAGE < 0) {
-				LOGGER.info("El valor del numero de pagina de estampacion del CSV es invalido: " + CFG.getProperty(CFG_KEY_CSV_PAGE)); //$NON-NLS-1$
+				LOGGER.severe("El valor del numero de pagina de estampacion del CSV es invalido: " + CFG.getProperty(CFG_KEY_CSV_PAGE)); //$NON-NLS-1$
 				throw new UnsupportedOperationException(
 					"El valor del numero de pagina de estampacion del CSV es invalido: " + CFG.getProperty(CFG_KEY_CSV_PAGE) //$NON-NLS-1$
 				);
@@ -131,7 +131,7 @@ public final class SimplePdfCsvStamper {
 			);
 		}
 		catch (final Exception e) {
-			LOGGER.info("No se han configurado adecuadamente los valores de estampacion del CSV: " + e); //$NON-NLS-1$
+			LOGGER.severe("No se han configurado adecuadamente los valores de estampacion del CSV: " + e); //$NON-NLS-1$
 			throw new IllegalStateException(
 				"No se han configurado adecuadamente los valores de estampacion del CSV: " + e //$NON-NLS-1$
 			);
@@ -159,7 +159,7 @@ public final class SimplePdfCsvStamper {
 			if (ServiceConfig.DEBUG) {
 				LOGGER.warning("Datos recibidos:\n" + new String(inPdf)); //$NON-NLS-1$
 			}
-			LOGGER.warning("La entrada no es un PDF"); //$NON-NLS-1$
+			LOGGER.severe("La entrada no es un PDF"); //$NON-NLS-1$
 			throw new AOFormatFileException(
 				"La entrada no es un PDF" //$NON-NLS-1$
 			);
