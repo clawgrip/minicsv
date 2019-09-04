@@ -257,6 +257,9 @@ public final class CmsDocumentManager  {
 			return s.getObjectByPath(fileNameWithPath) != null;
 		}
 		catch (final CmisObjectNotFoundException e) {
+			Logger.getLogger(CmsDocumentManager.class.getName()).info(
+				"El documento '" + fileNameWithPath + "' no existe en el CMS en la sesion actual: " + e //$NON-NLS-1$ //$NON-NLS-2$
+			);
 			return false;
 		}
 	}
