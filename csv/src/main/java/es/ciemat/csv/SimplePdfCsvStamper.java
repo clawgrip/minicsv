@@ -190,8 +190,7 @@ public final class SimplePdfCsvStamper {
 		final byte[] csv = PdfExtraUtil.createCsvAsJpeg(
 			pdfId,
 			infos,
-			null, // textTemplate
-			null //linkTemplate
+			null // textTemplate
 		);
 
 		// Estampamos el CSV
@@ -201,7 +200,7 @@ public final class SimplePdfCsvStamper {
 			CSV_LEFT,
 			CSV_BOTTOM,
 			CSV_PAGE,
-			PdfExtraUtil.getLink(pdfId, null)
+			PdfExtraUtil.getLink(pdfId)
 		);
 
 		// Sellamos el PDF y lo devolvemos todo

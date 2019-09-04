@@ -271,8 +271,7 @@ public final class TestPdfUtils {
 		final byte[] csv = PdfExtraUtil.createCsvAsJpeg(
 			id,
 			infos,
-			null, // textTemplate
-			null // linkTemplate
+			null // textTemplate
 		);
 
 		try (
@@ -373,7 +372,7 @@ public final class TestPdfUtils {
 
 	}
 	/** Prueba de la obtenci&oacute;n del identificador de un documento.
-	 * @throws Exception EN cualquier error. */
+	 * @throws Exception En cualquier error. */
 	@SuppressWarnings("static-method")
 	@Test
 	//@Ignore
@@ -407,7 +406,6 @@ public final class TestPdfUtils {
 			fos.flush();
 			fos.close();
 		}
-
 	}
 
 }

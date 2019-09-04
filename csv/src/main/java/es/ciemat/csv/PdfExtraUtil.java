@@ -38,11 +38,11 @@ import es.gob.afirma.signers.pades.PdfPreProcessor;
  * @author Tom&aacute;s Garc&iacute;a-Mer&aacute;s. */
 public final class PdfExtraUtil {
 
-	private static final String CSV_LINK_TEMPLATE_URLID = "$$URLID$$"; //$NON-NLS-1$
 	private static final String CSV_TEXT_TEMPLATE_SUBJECTCN = "$$SUBJECTCN$$"; //$NON-NLS-1$
 	private static final String CSV_TEXT_TEMPLATE_SIGNDATE = "$$SIGNDATE$$"; //$NON-NLS-1$
 
-	private static final String DEFAULT_CSV_LINK_TEMPLATE = "https://www.google.com/search?q=" +  CSV_LINK_TEMPLATE_URLID; //$NON-NLS-1$
+	private static final String CSV_LINK_TEMPLATE_CVS = "%csv%"; //$NON-NLS-1$
+
 	private static final String DEFAULT_CSV_TEXT_TEMPLATE = "Firmado por " + CSV_TEXT_TEMPLATE_SUBJECTCN + " en fecha " + CSV_TEXT_TEMPLATE_SIGNDATE; //$NON-NLS-1$ //$NON-NLS-2$
 
 	private static final int CSV_SPACING = 2;
@@ -59,15 +59,13 @@ public final class PdfExtraUtil {
 		// No instanciable
 	}
 
-	static String getLink(final String id, final String linkTemplate) {
-		return (linkTemplate != null ? linkTemplate : DEFAULT_CSV_LINK_TEMPLATE)
-			.replace(CSV_LINK_TEMPLATE_URLID, id);
+	static String getLink(final String id) {
+		return ServiceConfig.getCsvRetrieveUrl().replace(CSV_LINK_TEMPLATE_CVS, id);
 	}
 
 	static byte[] createCsvAsJpeg(final String id,
 			                      final AOSimpleSignInfo[] signatures,
-			                      final String textTemplate,
-			                      final String linkTemplate) throws IOException {
+			                      final String textTemplate) throws IOException {
 
 		if (id == null || id.isEmpty()) {
 			throw new IllegalArgumentException("Es necesario proporcionar un ID"); //$NON-NLS-1$
@@ -78,7 +76,7 @@ public final class PdfExtraUtil {
 		}
 
 		final StringBuilder sb = new StringBuilder(
-			getLink(id, linkTemplate)
+			getLink(id)
 		);
 		sb.append('\n');
 		for (final AOSimpleSignInfo ssi : signatures) {

@@ -20,6 +20,8 @@ public final class ServiceConfig implements ServletContextListener {
 	private static final Properties CFG = new Properties();
 
 	private static final String KEY_STORER_CLASSNAME = "csvstorer"; //$NON-NLS-1$
+	private static final String KEY_WEB_REDIRECT_ERR = "weberrorredirect"; //$NON-NLS-1$
+	private static final String KEY_WEB_RETRIEVE_URL = "csvretrieveurl"; //$NON-NLS-1$
 
 	private static CsvStorer csvStorer = null;
 
@@ -46,10 +48,32 @@ public final class ServiceConfig implements ServletContextListener {
 			);
 		}
         if (DEBUG) {
-        	Logger.getLogger(ServiceConfig.class.getName()).warning(
+        	LOGGER.warning(
     			"Modo de depuracion activo para el sistema de CSV" //$NON-NLS-1$
 			);
         }
+    }
+
+    static String getCsvRetrieveUrl() {
+    	final String url = CFG.getProperty(KEY_WEB_RETRIEVE_URL);
+    	if (url == null || url.isEmpty()) {
+    		throw new IllegalStateException(
+				"No se ha indicado la URL de recuperacion de CSV en el fichero 'service.properties'" //$NON-NLS-1$
+			);
+    	}
+    	LOGGER.info("La URL de recuperacion de CSV es: " + url); //$NON-NLS-1$
+    	return url;
+    }
+
+    static String getWebErrorRedirectUrl() {
+    	final String url = CFG.getProperty(KEY_WEB_REDIRECT_ERR);
+    	if (url == null || url.isEmpty()) {
+    		throw new IllegalStateException(
+				"No se ha indicado la URL de redireccion en caso de error en el fichero 'service.properties'" //$NON-NLS-1$
+			);
+    	}
+    	LOGGER.info("La URL de redireccion en caso de error web es: " + url); //$NON-NLS-1$
+    	return url;
     }
 
     static CsvStorer getCsvStorer() {

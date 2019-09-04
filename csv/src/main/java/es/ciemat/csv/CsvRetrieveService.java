@@ -14,12 +14,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
+import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
+
 import es.ciemat.csv.PdfExtraUtil.PdfId;
 import es.gob.afirma.core.misc.AOUtil;
 import es.gob.afirma.core.misc.Base64;
 
 /** Servicio de recuperaci&oacute;n de documentos con CSV. */
-@WebServlet(description = "Servicio de recuperacion de documentos con CSV", urlPatterns = { "/CsvRetrieveService" })
+@WebServlet(name = "Servicio de recuperacion de documentos con CSV", urlPatterns = { "/CsvRetrieveService" })
 @MultipartConfig
 public final class CsvRetrieveService extends HttpServlet {
 
@@ -31,11 +33,14 @@ public final class CsvRetrieveService extends HttpServlet {
 
 	private static final Logger LOGGER = Logger.getLogger(CsvService.class.getName());
 
+	private static final String REDIR_MSG_TAG = "%msg%"; //$NON-NLS-1$
+
 	@Override
 	protected void doGet(final HttpServletRequest request,
 			               final HttpServletResponse response) throws ServletException,
 	                                                                  IOException {
 		final String csv = request.getParameter(PARAM_CSV);
+		final String redirUrl = ServiceConfig.getWebErrorRedirectUrl();
 		if (csv != null && !csv.isEmpty()) {
 			final CsvStorer storer = ServiceConfig.getCsvStorer();
 
@@ -43,40 +48,49 @@ public final class CsvRetrieveService extends HttpServlet {
 			try {
 				pdf = storer.retrievePdfWithCsv(
 					new PdfId(
-						URLDecoder.decode(csv, "UTF-8") //$NON-NLS-1$
+						URLDecoder.decode(csv.trim(), "UTF-8") //$NON-NLS-1$
 					)
 				);
 			}
 			catch (final CsvStorerException e) {
-				response.sendError(
-					HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
-					"Error obteniendo el PDF con CSV '" + URLDecoder.decode(csv, "UTF-8") + "': " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				);
+				final String msg = "Error obteniendo el PDF con CSV '" + URLDecoder.decode(csv, "UTF-8") + "'"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				LOGGER.severe(msg + ": " + e); //$NON-NLS-1$
+				response.sendRedirect(redirUrl.replace(REDIR_MSG_TAG, msg));
 			}
 			catch (final CsvFileNotFoundException e) {
-				response.sendError(
-					HttpServletResponse.SC_BAD_REQUEST,
-					"No hay un PDF con CSV '" + URLDecoder.decode(csv, "UTF-8") + "': " + e //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
-				);
+				final String msg = "No hay un PDF con CSV '" + URLDecoder.decode(csv, "UTF-8") + "'"; //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$
+				LOGGER.severe(msg + ": " + e); //$NON-NLS-1$
+				response.sendRedirect(redirUrl.replace(REDIR_MSG_TAG, msg));
+			}
+			catch (final CmisObjectNotFoundException e) {
+				final String msg = "No se ha encontrado el objeto CMIS"; //$NON-NLS-1$
+				LOGGER.severe(msg + ": " + e); //$NON-NLS-1$
+				response.sendRedirect(redirUrl.replace(REDIR_MSG_TAG, msg));
 			}
 
 			// Ya tenemos el PDF, lo devolvemos en el response con el MIME-Type apropiado
-			try (
-				final OutputStream os = response.getOutputStream()
-			) {
-				response.setContentType("application/pdf"); //$NON-NLS-1$
-			    os.write(pdf);
-			    os.flush();
-			    os.close();
+			if (pdf != null) {
+					try (
+					final OutputStream os = response.getOutputStream()
+				) {
+					response.setContentType("application/pdf"); //$NON-NLS-1$
+					os.write(pdf);
+					os.flush();
+					os.close();
+				}
+			}
+			else {
+				final String msg = "Se ha obtenido un PDF nulo"; //$NON-NLS-1$
+				LOGGER.severe(msg);
+				response.sendRedirect(redirUrl.replace(REDIR_MSG_TAG, msg));
 			}
 
 			return;
 		}
 
-		response.sendError(
-			HttpServletResponse.SC_BAD_REQUEST,
-			"Es necesario indicar un numero de CSV" //$NON-NLS-1$
-		);
+		final String msg = "No se ha indicado un CSV"; //$NON-NLS-1$
+		LOGGER.severe(msg);
+		response.sendRedirect(redirUrl.replace(REDIR_MSG_TAG, msg));
 	}
 
 	@Override
