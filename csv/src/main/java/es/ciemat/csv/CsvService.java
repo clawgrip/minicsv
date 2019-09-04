@@ -15,7 +15,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.Part;
 
-import es.ciemat.csv.PdfExtraUtil.PdfId;
 import es.gob.afirma.core.AOException;
 import es.gob.afirma.core.AOFormatFileException;
 import es.gob.afirma.core.misc.AOUtil;
@@ -89,9 +88,12 @@ public final class CsvService extends HttpServlet {
 
 		LOGGER.info("Obtenido un documento de " + fileData.length +  " octetos"); //$NON-NLS-1$ //$NON-NLS-2$
 
-	    final PdfId pdfId;
+		// En este punto tenemos el PDF con las firmas
+
+		// Obtenemos el procesador y dejamos que el lo haga todo
+		final CsvProcessor cp = ServiceConfig.getCsvProcessor();
 	    try {
-	    	pdfId = SimplePdfCsvStamper.stampCsv(fileData);
+			cp.doCsv(fileData);
 		}
 	    catch (final AOFormatFileException e) {
 	    	LOGGER.severe("La entrada no es un documento PDF: " + e); //$NON-NLS-1$
@@ -141,22 +143,6 @@ public final class CsvService extends HttpServlet {
 			);
 			return;
 		}
-	    catch(final Exception | Error e) {
-	    	LOGGER.log(Level.SEVERE, "Error indefinido durante la estampacion: " + e, e); //$NON-NLS-1$
-	    	response.sendError(
-    			HttpURLConnection.HTTP_BAD_REQUEST,
-    			"Error indefinido durante la estampacion" //$NON-NLS-1$
-			);
-			return;
-	    }
-
-	    LOGGER.info("El ID del documento recibido es: " + pdfId.getId()); //$NON-NLS-1$
-
-	    // Enviamos el PDF
-	    final CsvStorer storer = ServiceConfig.getCsvStorer();
-	    try {
-			storer.storePdfWithCsv(pdfId, fileData);
-		}
 	    catch (final CsvStorerException e) {
 	    	LOGGER.log(
     			Level.SEVERE,
@@ -169,6 +155,14 @@ public final class CsvService extends HttpServlet {
 			);
 	    	return;
 		}
+	    catch(final Exception | Error e) {
+	    	LOGGER.log(Level.SEVERE, "Error indefinido durante la estampacion: " + e, e); //$NON-NLS-1$
+	    	response.sendError(
+    			HttpURLConnection.HTTP_BAD_REQUEST,
+    			"Error indefinido durante la estampacion" //$NON-NLS-1$
+			);
+			return;
+	    }
 
 	    LOGGER.info("Proceso terminado con exito"); //$NON-NLS-1$
 

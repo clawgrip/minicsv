@@ -20,10 +20,14 @@ public final class ServiceConfig implements ServletContextListener {
 	private static final Properties CFG = new Properties();
 
 	private static final String KEY_STORER_CLASSNAME = "csvstorer"; //$NON-NLS-1$
+	private static final String KEY_PROCESSOR_CLASSNAME = "csvprocessor"; //$NON-NLS-1$
+
 	private static final String KEY_WEB_REDIRECT_ERR = "weberrorredirect"; //$NON-NLS-1$
 	private static final String KEY_WEB_RETRIEVE_URL = "csvretrieveurl"; //$NON-NLS-1$
 
 	private static CsvStorer csvStorer = null;
+	private static CsvProcessor csvProcessor = null;
+
 
 	private static final Logger LOGGER = Logger.getLogger(ServiceConfig.class.getName());
 
@@ -76,15 +80,50 @@ public final class ServiceConfig implements ServletContextListener {
     	return url;
     }
 
+    static CsvProcessor getCsvProcessor() {
+    	if (ServiceConfig.csvProcessor == null) {
+    		final String processorClassName = CFG.getProperty(KEY_PROCESSOR_CLASSNAME);
+    		if (processorClassName == null) {
+    			LOGGER.severe(
+					"No se ha definido en la configuracion el valor del parametro '" + KEY_PROCESSOR_CLASSNAME + "' en el fichero 'service.properties'" //$NON-NLS-1$ //$NON-NLS-2$
+				);
+    			throw new IllegalStateException(
+					"No se ha definido en la configuracion el valor del parametro '" + KEY_PROCESSOR_CLASSNAME + "' en el fichero 'service.properties'" //$NON-NLS-1$ //$NON-NLS-2$
+				);
+    		}
+    		try {
+				csvProcessor = (CsvProcessor) Class.forName(processorClassName).getConstructor().newInstance();
+			}
+    		catch (final InstantiationException    |
+    			         IllegalAccessException    |
+    			         IllegalArgumentException  |
+    			         InvocationTargetException |
+    			         NoSuchMethodException     |
+    			         SecurityException         |
+    			         ClassNotFoundException e) {
+    			LOGGER.severe(
+					"No se ha podido instanciar la clase de proceso de CSV ('" + processorClassName + "'): " + e //$NON-NLS-1$ //$NON-NLS-2$
+				);
+    			throw new IllegalStateException(
+					"No se ha podido instanciar la clase de proceso de CSV ('" + processorClassName + "'): " + e //$NON-NLS-1$ //$NON-NLS-2$
+				);
+			}
+    	}
+    	LOGGER.info(
+			"Se usara el procesador de documentos: " + csvProcessor //$NON-NLS-1$
+		);
+    	return ServiceConfig.csvProcessor;
+    }
+
     static CsvStorer getCsvStorer() {
     	if (ServiceConfig.csvStorer == null) {
     		final String storerClassName = CFG.getProperty(KEY_STORER_CLASSNAME);
     		if (storerClassName == null) {
     			LOGGER.severe(
-					"No se ha definido en la configuracion el valor del parametro '" + KEY_STORER_CLASSNAME + "'" //$NON-NLS-1$ //$NON-NLS-2$
+					"No se ha definido en la configuracion el valor del parametro '" + KEY_STORER_CLASSNAME + "' en el fichero 'service.properties'" //$NON-NLS-1$ //$NON-NLS-2$
 				);
     			throw new IllegalStateException(
-					"No se ha definido en la configuracion el valor del parametro '" + KEY_STORER_CLASSNAME + "'" //$NON-NLS-1$ //$NON-NLS-2$
+					"No se ha definido en la configuracion el valor del parametro '" + KEY_STORER_CLASSNAME + "' en el fichero 'service.properties'" //$NON-NLS-1$ //$NON-NLS-2$
 				);
     		}
     		try {

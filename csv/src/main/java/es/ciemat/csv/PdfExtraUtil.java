@@ -59,7 +59,10 @@ public final class PdfExtraUtil {
 		// No instanciable
 	}
 
-	static String getLink(final String id) {
+	/** Obtiene la URL del CSV dado dentro del sistema.
+	 * @param id CSV del PDF
+	 * @return URL del enlace. */
+	public static String getLink(final String id) {
 		return ServiceConfig.getCsvRetrieveUrl().replace(CSV_LINK_TEMPLATE_CVS, id);
 	}
 
