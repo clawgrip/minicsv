@@ -79,7 +79,7 @@ public final class CsvProcessorEeutil implements CsvProcessor {
     	copiaInfoExtended.setTituloURL("DIRECCIÓN DE VALIDACIÓN");
     	copiaInfoExtended.setEstamparLogo(false);
     	copiaInfoExtended.setLateral(
-			"Código seguro de Verificación :" csv + ". Puede verificar la integridad de este documento en la siguiente dirección:" + recoverURL
+			"Código seguro de Verificación :" + csv + ". Puede verificar la integridad de este documento en la siguiente dirección:" + recoverURL
 		);
     	copiaInfoExtended.setUrlQR(recoverURL);
     	copiaInfoExtended.setFirma(signedPdf);
