@@ -21,12 +21,14 @@ public final class ServiceConfig implements ServletContextListener {
 
 	private static final String KEY_STORER_CLASSNAME = "csvstorer"; //$NON-NLS-1$
 	private static final String KEY_PROCESSOR_CLASSNAME = "csvprocessor"; //$NON-NLS-1$
+	private static final String KEY_SIGNER_CLASSNAME = "csvsigner"; //$NON-NLS-1$
 
 	private static final String KEY_WEB_REDIRECT_ERR = "weberrorredirect"; //$NON-NLS-1$
 	private static final String KEY_WEB_RETRIEVE_URL = "csvretrieveurl"; //$NON-NLS-1$
 
 	private static CsvStorer csvStorer = null;
 	private static CsvProcessor csvProcessor = null;
+	private static CsvSigner csvSigner = null;
 
 
 	private static final Logger LOGGER = Logger.getLogger(ServiceConfig.class.getName());
@@ -113,6 +115,41 @@ public final class ServiceConfig implements ServletContextListener {
 			"Se usara el procesador de documentos: " + csvProcessor //$NON-NLS-1$
 		);
     	return ServiceConfig.csvProcessor;
+    }
+
+    static CsvSigner getCsvSigner() {
+    	if (ServiceConfig.csvSigner == null) {
+    		final String signerClassName = CFG.getProperty(KEY_SIGNER_CLASSNAME);
+    		if (signerClassName == null) {
+    			LOGGER.severe(
+					"No se ha definido en la configuracion el valor del parametro '" + KEY_SIGNER_CLASSNAME + "' en el fichero 'service.properties'" //$NON-NLS-1$ //$NON-NLS-2$
+				);
+    			throw new IllegalStateException(
+					"No se ha definido en la configuracion el valor del parametro '" + KEY_SIGNER_CLASSNAME + "' en el fichero 'service.properties'" //$NON-NLS-1$ //$NON-NLS-2$
+				);
+    		}
+    		try {
+    			csvSigner = (CsvSigner) Class.forName(signerClassName).getConstructor().newInstance();
+			}
+    		catch (final InstantiationException    |
+    			         IllegalAccessException    |
+    			         IllegalArgumentException  |
+    			         InvocationTargetException |
+    			         NoSuchMethodException     |
+    			         SecurityException         |
+    			         ClassNotFoundException e) {
+    			LOGGER.severe(
+					"No se ha podido instanciar la clase de firma de CSV ('" + signerClassName + "'): " + e //$NON-NLS-1$ //$NON-NLS-2$
+				);
+    			throw new IllegalStateException(
+					"No se ha podido instanciar la clase de firma de CSV ('" + signerClassName + "'): " + e //$NON-NLS-1$ //$NON-NLS-2$
+				);
+			}
+    	}
+    	LOGGER.info(
+			"Se usara el procesador de documentos: " + csvSigner //$NON-NLS-1$
+		);
+    	return ServiceConfig.csvSigner;
     }
 
     static CsvStorer getCsvStorer() {
